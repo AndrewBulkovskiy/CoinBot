@@ -113,7 +113,12 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
+    <Compile Include="Dialogs\AddAlertDialog.cs" />
+    <Compile Include="Dialogs\AddCurrencyDialog.cs" />
+    <Compile Include="Dialogs\RemoveCurrencyDialog.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
+    <Compile Include="Dialogs\ShowOptionsDialog.cs" />
+    <Compile Include="Dialogs\ShowPortfolioDialog.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
