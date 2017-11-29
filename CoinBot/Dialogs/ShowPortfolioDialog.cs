@@ -1,4 +1,7 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using CoinBot.DAL.DTO;
+using CoinBot.DAL.Entities;
+using CoinBot.DAL.Interfaces;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Connector;
 using System;
@@ -12,16 +15,36 @@ namespace CoinBot.Dialogs
     [Serializable]
     public class ShowPortfolioDialog : IDialog<string>
     {
-        public async Task StartAsync(IDialogContext context)
+        ICurrencyService _service;
+
+        public ShowPortfolioDialog(ICurrencyService service)
         {
-            await context.PostAsync("Getting portfolio data...");
-            context.Wait(this.MessageReceivedAsync);
+            _service = service;
         }
 
-        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        public async Task StartAsync(IDialogContext context)
         {
-            var message = await result;
-            context.Done("Portfolio showed");
+            await this.ShowPortfolio(context);
         }
+
+        private async Task ShowPortfolio(IDialogContext context)
+        {
+            if (_service.Portfolio.Count > 0)
+            {
+                _service.RefreshPortfolio();
+                string res = "";
+                foreach (var item in _service.Portfolio)
+                {
+                    res += item.ToString() + "\n\n";
+                }
+                await context.PostAsync($"Portolio:\n\n {res}");
+            }
+            else
+            {
+                await context.PostAsync("Seems like your portfolio is empty now.\n\nYpu can add first currency to it right now!");
+            }
+            context.Done(String.Empty);
+        }
+
     }
 }

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Autofac;
+using CoinBot.Infrastructure;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Internals.Fibers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,7 +15,32 @@ namespace CoinBot
     {
         protected void Application_Start()
         {
+            this.RegisterBotModules();
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
+
+        private void RegisterBotModules()
+        {
+            Conversation.UpdateContainer(builder =>
+            {
+                builder.RegisterModule(new ReflectionSurrogateModule());
+                builder.RegisterModule<GlobalMessageHandlersBotModule>();
+            });
+        }
+
+        //protected void Application_Start()
+        //{
+        //    this.RegisterBotModules();
+
+        //    GlobalConfiguration.Configure(WebApiConfig.Register);
+        //}
+
+        //private void RegisterBotModules()
+        //{
+        //    var builder = new ContainerBuilder();
+        //    builder.RegisterModule(new ReflectionSurrogateModule());
+        //    builder.RegisterModule<GlobalMessageHandlersBotModule>();
+        //    builder.Update(Conversation.Container);
+        //}
     }
 }

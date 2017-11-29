@@ -4,12 +4,21 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using CoinBot.DAL.Interfaces;
+using CoinBot.DAL.Services;
+using System;
+using System.Linq;
 
 namespace CoinBot
 {
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+        ICurrencyService _service;
+        public MessagesController()
+        {
+            _service = new CoinMarketCapService();
+        }
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
@@ -18,17 +27,17 @@ namespace CoinBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog(_service));
             }
             else
             {
-                HandleSystemMessage(activity);
+                HandleSystemMessageAsync(activity);
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
 
-        private Activity HandleSystemMessage(Activity message)
+        private async Task<Activity> HandleSystemMessageAsync(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
             {
@@ -52,6 +61,7 @@ namespace CoinBot
             }
             else if (message.Type == ActivityTypes.Ping)
             {
+
             }
 
             return null;

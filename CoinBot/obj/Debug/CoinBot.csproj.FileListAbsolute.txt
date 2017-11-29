@@ -44,6 +44,7 @@ C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Bot Application.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Bot Application.pdb
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Autofac.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Chronic.dll
+C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\CoinBot.DAL.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Microsoft.Bot.Builder.Autofac.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Microsoft.Bot.Builder.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Microsoft.Bot.Connector.dll
@@ -55,6 +56,7 @@ C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\System.IdentityModel.Tokens
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\System.Net.Http.Formatting.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\System.Web.Http.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\System.Web.Http.WebHost.dll
+C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\CoinBot.DAL.pdb
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Autofac.xml
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Microsoft.Bot.Builder.xml
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot\bin\Microsoft.Bot.Builder.Autofac.xml
