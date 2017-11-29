@@ -46,6 +46,7 @@ namespace CoinBot.Dialogs
             if (isCurrencyAvaliable)
             {
                 var currency = _service.GetCurrencyByNameOrSymbol(currencyNameOrSymbol);
+                currency.Multiplier = currencyValue;
                 bool portfolioContainsCurrency = _service.IsCurrencyInPortfolio(currency);
 
                 // Checking if users portfolio already contains that currency
@@ -68,7 +69,7 @@ namespace CoinBot.Dialogs
             }
             else
             {
-                await context.PostAsync("Sorry i can't find that currency."); 
+                await context.PostAsync("Sorry i can't find that currency.");
             }
             context.Done(String.Empty);
         }

@@ -39,10 +39,14 @@ namespace CoinBot.DAL.Services
         public delegate void PortfolioEvent();
         public event PortfolioEvent OnPortfolioGrowth;
 
+        // Returns fresh updated currency
         public CurrencyDTO GetCurrencyByNameOrSymbol(string currencyNameOrSymbol)
         {
-            return _avaliableCurrencies.Where(c => c.Name == currencyNameOrSymbol || c.Symbol == currencyNameOrSymbol)
+            var currency = _avaliableCurrencies.Where(c => c.Name == currencyNameOrSymbol || c.Symbol == currencyNameOrSymbol)
                     .FirstOrDefault();
+            if (currency != null)
+                return this.GetCurrencyById(currency.Id);
+            return null;
         }
 
         public void AddCurrencyToPortfolio(CurrencyDTO currency)
