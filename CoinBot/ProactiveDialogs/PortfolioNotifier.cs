@@ -1,17 +1,6 @@
-﻿using Autofac;
-using CoinBot.DAL.Interfaces;
-using CoinBot.DAL.Services;
-using CoinBot.Dialogs;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Dialogs.Internals;
-using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
+﻿using Microsoft.Bot.Connector;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CoinBot.ProactiveDialogs
 {
@@ -26,7 +15,7 @@ namespace CoinBot.ProactiveDialogs
         public static string channelId;
         public static string conversationId;
 
-        public static async Task Notify()
+        public static async Task NotifyPortfolioGrowth()
        {
             var userAccount = new ChannelAccount(toId, toName);
             var botAccount = new ChannelAccount(fromId, fromName);

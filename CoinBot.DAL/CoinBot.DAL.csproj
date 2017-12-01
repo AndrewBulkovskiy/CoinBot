@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="DTO\CurrencyDTO.cs" />
     <Compile Include="Entities\Currency.cs" />
+    <Compile Include="Infrastructure\Ticker.cs" />
     <Compile Include="Interfaces\ICurrencyService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CoinMarketCapService.cs" />

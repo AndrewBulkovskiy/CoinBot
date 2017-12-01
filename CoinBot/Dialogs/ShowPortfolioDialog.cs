@@ -1,14 +1,7 @@
-﻿using CoinBot.DAL.DTO;
-using CoinBot.DAL.Entities;
-using CoinBot.DAL.Interfaces;
+﻿using CoinBot.DAL.Interfaces;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.FormFlow;
-using Microsoft.Bot.Connector;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CoinBot.Dialogs
 {
@@ -32,18 +25,20 @@ namespace CoinBot.Dialogs
             if (_service.Portfolio.Count > 0)
             {
                 _service.RefreshPortfolio();
-                string res = "";
+                string portfolioString = "**Your Portfolio:** \n\n";
+                double portfolioTotalValue = 0.0;
                 foreach (var item in _service.Portfolio)
                 {
-                    res += item.ToString() + "\n\n";
+                    portfolioString += $"* {item} \n\n";
+                    portfolioTotalValue += item.Multiplier * item.Price;
                 }
-                await context.PostAsync($"Portolio:\n\n {res}");
+                portfolioString += $"**Total value:** {portfolioTotalValue} USD";
+                context.Done(portfolioString);
             }
             else
             {
-                await context.PostAsync("Seems like your portfolio is empty now.\n\nYpu can add first currency to it right now!");
+                context.Done("Seems like your portfolio is empty now.\n\nYou can add first currency to it right now!");
             }
-            context.Done(String.Empty);
         }
 
     }

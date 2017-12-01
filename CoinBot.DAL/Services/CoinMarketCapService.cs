@@ -1,52 +1,55 @@
 ﻿using CoinBot.DAL.DTO;
 using CoinBot.DAL.Entities;
+using CoinBot.DAL.Infrastructure;
 using CoinBot.DAL.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace CoinBot.DAL.Services
 {
     [Serializable]
     public class CoinMarketCapService : ICurrencyService
     {
+        public List<CurrencyDTO> Portfolio { get; }
+
+        public delegate void PortfolioEvent();
+
+        //In real life Portfolio will be stored in DB or  Azure Table i think
+        public event PortfolioEvent OnPortfolioGrowth;
+
         // This variable (_avaliableCurrencies) saves network requests (for example in Add currency command)
         // We do not need to send network request just to check if currency name is right
         private List<CurrencyDTO> _avaliableCurrencies;
-        private static Timer _timer;
         private string _apiUrl = "https://api.coinmarketcap.com/v1/ticker/";
-        private int _timerInterval = 10000;
+        private int _timerInterval = 60000;
         private double _portfolioGrowthPercentage;
 
         public CoinMarketCapService()
         {
-            //_provider = new CoinMarketCapProvider();
             Portfolio = new List<CurrencyDTO>();
             RefreshAvaliableCurrenciesData();
-            _timer = new Timer(_timerInterval);
-            _timer.Elapsed += new ElapsedEventHandler(CheckPortfolioGrowth);
-            //_timer.Enabled = true;
-            //_timer.Stop();
         }
-
-        public List<CurrencyDTO> Portfolio { get; }
-
-        public delegate void PortfolioEvent();
-        public event PortfolioEvent OnPortfolioGrowth;
 
         // Returns fresh updated currency
         public CurrencyDTO GetCurrencyByNameOrSymbol(string currencyNameOrSymbol)
         {
-            var currency = _avaliableCurrencies.Where(c => c.Name == currencyNameOrSymbol || c.Symbol == currencyNameOrSymbol)
+            if (currencyNameOrSymbol == null || string.IsNullOrWhiteSpace(currencyNameOrSymbol))
+                return null;
+
+            string filteredName = char.ToUpper(currencyNameOrSymbol[0]) + currencyNameOrSymbol.Substring(1);
+            string filteredSymbol = currencyNameOrSymbol.ToUpper();
+
+            var currency = _avaliableCurrencies.Where(c => c.Name == filteredName || c.Symbol == filteredSymbol)
                     .FirstOrDefault();
+
             if (currency != null)
                 return this.GetCurrencyById(currency.Id);
-            return null;
+            else
+                return null;
         }
 
         public void AddCurrencyToPortfolio(CurrencyDTO currency)
@@ -63,8 +66,15 @@ namespace CoinBot.DAL.Services
 
         public bool IsCurrencyAvaliable(string currencyNameOrSymbol)
         {
-            var currency = _avaliableCurrencies.Where(c => c.Name == currencyNameOrSymbol || c.Symbol == currencyNameOrSymbol)
+            if (currencyNameOrSymbol == null || string.IsNullOrWhiteSpace(currencyNameOrSymbol))
+                return false;
+
+            string filteredName = char.ToUpper(currencyNameOrSymbol[0]) + currencyNameOrSymbol.Substring(1);
+            string filteredSymbol = currencyNameOrSymbol.ToUpper();
+
+            var currency = _avaliableCurrencies.Where(c => c.Name == filteredName || c.Symbol == filteredSymbol)
                     .FirstOrDefault();
+
             return (currency != null) ? true : false;
         }
 
@@ -73,7 +83,8 @@ namespace CoinBot.DAL.Services
             var contains = Portfolio.Where(c => c.Equals(currency)).FirstOrDefault();
             if (contains != null)
                 return true;
-            return false;
+            else
+                return false;
         }
 
         // This method should be synchronous because we can`t work with half-updated potfolio
@@ -83,19 +94,23 @@ namespace CoinBot.DAL.Services
             {
                 var tempCurrency = this.GetCurrencyById(Portfolio[i].Id);
                 if (tempCurrency != null)
+                {
+                    tempCurrency.Multiplier = Portfolio[i].Multiplier;
                     Portfolio[i] = tempCurrency;
+                }
             }
         }
 
         public void StartTrackingPortfolio(double percentage)
         {
             this._portfolioGrowthPercentage = percentage;
-            _timer.Start();
+            Ticker.Start(_timerInterval);
+            Ticker.OnTick += CheckPortfolioGrowth;
         }
 
         public void StopTrackingPortfolio()
         {
-            _timer.Stop();
+            Ticker.Stop();
         }
 
         // This method should be synchronous because we can`t work with half-updated list of avaliable currencies
@@ -104,26 +119,32 @@ namespace CoinBot.DAL.Services
             _avaliableCurrencies = this.GetAllCurrencies();
         }
 
-        private void CheckPortfolioGrowth(object sender, ElapsedEventArgs e)
+        private void CheckPortfolioGrowth()
         {
+            // add overflow logic
+            double oldTotalValue = 0.0;
+            double newTotalValue = 0.0;
+
             for (int i = 0; i < Portfolio.Count; i++)
             {
                 var tempCurrency = this.GetCurrencyById(Portfolio[i].Id);
                 if (tempCurrency != null)
                 {
-                    double oldValue = Portfolio[i].Price*Portfolio[i].Multiplier;
-                    double newValue = tempCurrency.Price*tempCurrency.Multiplier;
-                    double percentageGrowth = ((newValue - oldValue) / Math.Truncate((newValue + oldValue) / 2.0)) * 100.0;
-                    if (percentageGrowth >= _portfolioGrowthPercentage)
-                    {
-                        OnPortfolioGrowth?.Invoke();
-                    }
+                    oldTotalValue += Portfolio[i].Price * Portfolio[i].Multiplier;
+                    newTotalValue += tempCurrency.Price * tempCurrency.Multiplier;
                 }
+            }
 
+            double percentageGrowth = ((newTotalValue - oldTotalValue) / Math.Truncate((newTotalValue + oldTotalValue) / 2.0)) * 100.0;
+
+            if (percentageGrowth >= _portfolioGrowthPercentage) 
+            {
+                OnPortfolioGrowth?.Invoke();
             }
         }
 
-        #region Getting data form WebApi
+
+        #region Getting data form Api
 
         public CurrencyDTO GetCurrencyById(string currencyId)
         {
@@ -144,6 +165,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
+                        // Add handling
                     }
                 }
             }
@@ -158,8 +180,7 @@ namespace CoinBot.DAL.Services
             string urlPath = _apiUrl + currencyId;
 
             using (var client = new HttpClient())
-            //using (var response = await client.GetAsync(urlPath))
-            using (var response = client.GetAsync(urlPath).Result)
+            using (var response = await client.GetAsync(urlPath))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -172,6 +193,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
+                        // Add handling
                     }
                 }
             }
@@ -197,8 +219,8 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
+                        // Add handling
                     }
-
                 }
             }
 
@@ -218,8 +240,7 @@ namespace CoinBot.DAL.Services
             string urlPath = _apiUrl;
 
             using (var client = new HttpClient())
-            //using (var response = await client.GetAsync(urlPath))
-            using (var response = client.GetAsync(urlPath).Result)
+            using (var response = await client.GetAsync(urlPath))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -231,6 +252,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
+                        // Add handling
                     }
                 }
             }

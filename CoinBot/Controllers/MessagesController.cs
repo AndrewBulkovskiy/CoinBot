@@ -6,8 +6,6 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using CoinBot.DAL.Interfaces;
 using CoinBot.DAL.Services;
-using System;
-using System.Linq;
 
 namespace CoinBot
 {

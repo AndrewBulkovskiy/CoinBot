@@ -1,11 +1,8 @@
 ﻿using CoinBot.DAL.Interfaces;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CoinBot.Dialogs
 {
@@ -19,10 +16,11 @@ namespace CoinBot.Dialogs
             _service = service;
         }
 
-        private const string MyPortfolioOption = "My portfolio";
+        private const string MyPortfolioOption = "See portfolio";
         private const string AddCurrencyOption = "Add currency";
         private const string RemoveCurrencyOption = "Remove currency";
-        private const string AlertOption = "Add alert";
+        private const string AlertOption = "Set alert";
+        private const string HelpOption = "Get help";
         private const string CancelOption = "Cancel";
 
         public async Task StartAsync(IDialogContext context)
@@ -32,7 +30,8 @@ namespace CoinBot.Dialogs
 
         private void ShowOptions(IDialogContext context)
         {
-            PromptDialog.Choice(context, this.OnOptionSelected, new List<string>() { MyPortfolioOption, AddCurrencyOption, RemoveCurrencyOption, AlertOption, CancelOption }, "What do you want to do?", "This is not a valid option, please try again", 1);
+            var PromptOptions = new List<string>() { MyPortfolioOption, AddCurrencyOption, RemoveCurrencyOption, AlertOption, HelpOption, CancelOption };
+            PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "What would you like to do?", "This is not a valid option, please try again.", 1);
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
@@ -47,27 +46,31 @@ namespace CoinBot.Dialogs
                         context.Call(new ShowPortfolioDialog(_service), this.ResumeAfterOptionDialog);
                         break;
                     case AddCurrencyOption:
+                        await context.PostAsync("Plesa type currency and value (e.g. *1.0 BTC*)");
                         context.Call(new AddCurrencyDialog(_service), this.ResumeAfterOptionDialog);
                         break;
                     case RemoveCurrencyOption:
+                        await context.PostAsync("Plesa type currency and value (e.g. *1.0 BTC*)");
                         context.Call(new RemoveCurrencyDialog(_service), this.ResumeAfterOptionDialog);
                         break;
                     case AlertOption:
-                        context.Call(new AddAlertDialog(_service), this.ResumeAfterOptionDialog);
+                        context.Call(new SetAlertDialog(_service), this.ResumeAfterOptionDialog);
+                        break;
+                    case HelpOption:
+                        context.Call(new HelpDialog(), this.ResumeAfterOptionDialog);
                         break;
                     case CancelOption:
-                        context.Done(String.Empty);
+                        context.Done(string.Empty);
                         break;
                 }
             }
             catch (TooManyAttemptsException ex)
             {
-                await context.PostAsync("Looks like you can`t decide. Let's start our conversation from the beginning.");
-                context.Done(String.Empty);
+                context.Fail(new TooManyAttemptsException("Seems like you can`t decide. Let's go back."));
             }
         }
 
-        private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<object> result)
+        private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<string> result)
         {
             var resultFromShowOptionsDialog = await result;
             context.Done(resultFromShowOptionsDialog);

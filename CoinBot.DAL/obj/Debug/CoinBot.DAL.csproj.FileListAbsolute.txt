@@ -2,7 +2,7 @@ C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\bin\Debug\CoinBot.DAL.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\bin\Debug\CoinBot.DAL.pdb
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\obj\Debug\CoinBot.DAL.csprojResolveAssemblyReference.cache
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\obj\Debug\CoinBot.DAL.csproj.CoreCompileInputs.cache
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\obj\Debug\CoinBot.DAL.dll
 C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\obj\Debug\CoinBot.DAL.pdb
+C:\Users\Andrew\Documents\GitHub\CoinBot\CoinBot.DAL\obj\Debug\CoinBot.DAL.csprojResolveAssemblyReference.cache

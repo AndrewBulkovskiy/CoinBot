@@ -1,24 +1,22 @@
 ﻿using CoinBot.DAL.Interfaces;
-using Microsoft.Bot.Builder.ConnectorEx;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using CoinBot.ProactiveDialogs;
 
 namespace CoinBot.Dialogs
 {
     [Serializable]
-    public class AddAlertDialog : IDialog<string>
+    public class SetAlertDialog : IDialog<string>
     {
         ICurrencyService _service;
         int attempts = 3;
+        private const string YesOption = "Yes";
+        private const string NoOption = "No";
 
-        public AddAlertDialog(ICurrencyService service)
+        public SetAlertDialog(ICurrencyService service)
         {
             _service = service;
         }
@@ -42,7 +40,7 @@ namespace CoinBot.Dialogs
             PortfolioNotifier.channelId = message.ChannelId;
             PortfolioNotifier.conversationId = message.Conversation.Id;
 
-            double percentageValue;
+            double percentageValue = 0.0;
             bool percentageRecognised = Double.TryParse(message.Text, out percentageValue);
 
             if (percentageRecognised)
@@ -50,13 +48,23 @@ namespace CoinBot.Dialogs
                 if (percentageValue > 0.0 && percentageValue <= 100.0)
                 {
                     _service.StartTrackingPortfolio(percentageValue);
-                    await context.PostAsync($"Ok, i will send a notification as soon as your portfolio will grow on {percentageValue} percents.");
-                    context.Done(String.Empty);
+                    context.Done($"Ok, i will send a notification as soon as your portfolio will grow on {percentageValue} percents.");
                 }
-                else 
+                else
                 {
-                    await context.PostAsync("Are you sure that you entered correct value? (It should be aa number greater than zero and less than one hundred.");
-                    context.Wait(this.MessageReceivedAsync);
+                    --attempts;
+                    if (attempts > 0)
+                    {
+                        await context.PostAsync("Please check your input (it should be a number greater than zero and less than one hundred.)");
+                        context.Wait(this.MessageReceivedAsync);
+                    }
+                    else
+                    {
+                        attempts = 2;
+                        await context.PostAsync("There seems to be a misunderstanding between us.");
+                        var PromptOptions = new List<string>() { YesOption, NoOption };
+                        PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "Let's return to the beginning of conversation?", "Let's return to the beginning of conversation?", 1);
+                    }
                 }
             }
             else
@@ -69,12 +77,32 @@ namespace CoinBot.Dialogs
                 }
                 else
                 {
-                    await context.PostAsync("There seems to be a misunderstanding between us. Let`s start over our dialog.");
-                    await context.PostAsync("let's return to the beginning of conversation.");
-                    context.Done(String.Empty);
+                    context.Done("Let's return to the beginning of conversation.");
                 }
+            }
+        }
+
+        private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
+        {
+            try
+            {
+                string optionSelected = await result;
+
+                switch (optionSelected)
+                {
+                    case YesOption:
+                        context.Done(string.Empty);
+                        break;
+                    case NoOption:
+                        break;
+                }
+            }
+            catch (TooManyAttemptsException)
+            {
+                context.Fail(new TooManyAttemptsException("It looks like a little misunderstanding. Let's start over."));
             }
 
         }
+
     }
 }

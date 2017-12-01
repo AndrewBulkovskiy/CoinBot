@@ -1,10 +1,5 @@
 ﻿using CoinBot.DAL.DTO;
-using CoinBot.DAL.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static CoinBot.DAL.Services.CoinMarketCapService;
 
 namespace CoinBot.DAL.Interfaces
