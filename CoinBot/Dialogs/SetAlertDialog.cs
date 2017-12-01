@@ -21,8 +21,15 @@ namespace CoinBot.Dialogs
 
         public async Task StartAsync(IDialogContext context)
         {
-            await context.PostAsync("How much percentage of your portfolio should increase in order to receive a notification?");
-            context.Wait(this.MessageReceivedAsync);
+            if (_service.Portfolio.Count > 0)
+            {
+                await context.PostAsync("How much percentage of your portfolio should increase in order to receive a notification?");
+                context.Wait(this.MessageReceivedAsync);
+            }
+            else
+            {
+                context.Done("Your portfolio seems to be empty.\n\nPlease add at least one currency to start tracking portfolio growth.");
+            }
         }
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
