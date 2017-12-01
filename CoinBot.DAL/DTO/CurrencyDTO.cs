@@ -45,7 +45,7 @@ namespace CoinBot.DAL.DTO
                 return false;
             }
 
-            return (Id == item.Id && Name == item.Name && Symbol == item.Symbol && Price == item.Price && Multiplier == item.Multiplier);
+            return (Id == item.Id && Name == item.Name && Symbol == item.Symbol);
         }
 
         public override int GetHashCode()

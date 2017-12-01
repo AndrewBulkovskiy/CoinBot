@@ -58,10 +58,33 @@ namespace CoinBot.DAL.Services
                 Portfolio.Add(currency);
         }
 
+        public void UpdateCurrency(CurrencyDTO currency)
+        {
+            for (int i = 0; i < Portfolio.Count; i++)
+            {
+                if (Portfolio[i].Equals(currency))
+                {
+                    Portfolio[i].Multiplier += currency.Multiplier;
+                }
+            }
+        }
+
         public void RemoveCurrencyFromPortfolio(CurrencyDTO currency)
         {
             if (currency != null)
-                Portfolio.Remove(currency);
+            {
+                for (int i = 0; i < Portfolio.Count; i++)
+                {
+                    if (Portfolio[i].Equals(currency))
+                    {
+                        decimal difference = Portfolio[i].Multiplier - currency.Multiplier;
+                        if (difference >= 0)
+                            Portfolio[i].Multiplier -= currency.Multiplier;
+                        else
+                            Portfolio.Remove(currency);
+                    }
+                }
+            }
         }
 
         public bool IsCurrencyAvaliable(string currencyNameOrSymbol)
@@ -136,7 +159,7 @@ namespace CoinBot.DAL.Services
 
             decimal percentageGrowth = ((newTotalValue - oldTotalValue) / Math.Truncate((newTotalValue + oldTotalValue) / 2.0m)) * 100.0m;
 
-            if (percentageGrowth >= _portfolioGrowthPercentage) 
+            if (percentageGrowth >= _portfolioGrowthPercentage)
             {
                 OnPortfolioGrowth?.Invoke();
             }

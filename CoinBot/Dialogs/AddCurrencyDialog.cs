@@ -116,7 +116,8 @@ namespace CoinBot.Dialogs
                     }
                     else
                     {
-                        context.Fail(new InvalidOperationException("Your portfolio already contains that currency."));
+                        _service.UpdateCurrency(currency);
+                        context.Done("Currency successfully updated!");
                     }
                 }
                 else
