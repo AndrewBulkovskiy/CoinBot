@@ -20,8 +20,13 @@ namespace CoinBot.Dialogs
 
         private void ShowOptions(IDialogContext context)
         {
-            var PromptOptions = new List<string>() { helpWithCurrenciesOption, helpWithAlertOption, HelpWithPortfolioOprion, CancelOption };
-            PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "How can i help you?", "This is not a valid option. Please try again:", 1);
+            var optionsList = new List<string>() { helpWithCurrenciesOption, helpWithAlertOption, HelpWithPortfolioOprion, CancelOption };
+            var options = new PromptOptions<string>("How can i help you?",
+                "This is not a valid option. Please try again:",
+                "Looks like you don`t need help anymore. Let's go back to the begining of our dialog.",
+                optionsList,
+                2);
+            PromptDialog.Choice(context, this.OnOptionSelected, options);
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
@@ -52,9 +57,8 @@ namespace CoinBot.Dialogs
                         break;
                 }
             }
-            catch (TooManyAttemptsException ex) // .PostAsync instead of.Fail because this is scorable dialog
+            catch (TooManyAttemptsException)
             {
-                await context.PostAsync("Looks like you don`t need help anymore. Let's go back to the begining of our dialog.");
                 context.Done(string.Empty);
             }
         }

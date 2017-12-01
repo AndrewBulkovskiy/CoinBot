@@ -30,8 +30,13 @@ namespace CoinBot.Dialogs
 
         private void ShowOptions(IDialogContext context)
         {
-            var PromptOptions = new List<string>() { MyPortfolioOption, AddCurrencyOption, RemoveCurrencyOption, AlertOption, HelpOption, CancelOption };
-            PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "What would you like to do?", "This is not a valid option, please try again.", 1);
+            var optionsList = new List<string>() { MyPortfolioOption, AddCurrencyOption, RemoveCurrencyOption, AlertOption, HelpOption, CancelOption };
+            var options = new PromptOptions<string>("What would you like to do?",
+                "This is not a valid option, please try again:",
+                "Seems like you can`t decide. Let's go back.",
+                optionsList,
+                1);
+            PromptDialog.Choice(context, this.OnOptionSelected, options);
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
@@ -64,9 +69,10 @@ namespace CoinBot.Dialogs
                         break;
                 }
             }
-            catch (TooManyAttemptsException ex)
+            catch (TooManyAttemptsException)
             {
-                context.Fail(new TooManyAttemptsException("Seems like you can`t decide. Let's go back."));
+                // TooManyAttemptsException message still will be displayed
+                context.Done(string.Empty);
             }
         }
 

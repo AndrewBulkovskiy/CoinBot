@@ -101,8 +101,13 @@ namespace CoinBot.Dialogs
                         if (_service.Portfolio.Count == 1) // Seems like it is the first user currency added, Congratulations :)
                         {
                             await context.PostAsync("Great! You added your first currency!");
-                            var PromptOptions = new List<string>() { RemoveCurrencyOption, ShowPortfolioOption, SetAlertOption };
-                            PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "Ok, now you can: ", "Please select one of the options below: ", 1);
+                            var optionsList = new List<string>() { RemoveCurrencyOption, ShowPortfolioOption, SetAlertOption };
+                            var options = new PromptOptions<string>("Ok, now you can: ",
+                                "Please select one of the options below:", 
+                                "It looks like a little misunderstanding. Lets move to the begining of conversation.",
+                                optionsList,
+                                1);
+                            PromptDialog.Choice(context, this.OnOptionSelected, options);
                         }
                         else
                         {
@@ -173,7 +178,8 @@ namespace CoinBot.Dialogs
             }
             catch (TooManyAttemptsException)
             {
-                context.Fail(new TooManyAttemptsException("It looks like a little misunderstanding. Lets move to the begining of conversation."));
+                // TooManyAttemptsException message still will be displayed
+                context.Done(string.Empty);
             }
         }
 

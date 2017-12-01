@@ -73,8 +73,13 @@ namespace CoinBot.Dialogs
                 else
                 {
                     attempts = 3;
-                    var PromptOptions = new List<string>() { YesOption, NoOption };
-                    PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "Maybye want to see all available options?", "Please select one of the options below: ", 1);
+                    var optionsList = new List<string>() { YesOption, NoOption };
+                    var options = new PromptOptions<string>("Maybye want to see all available options?", 
+                        "Sorry please try again:", 
+                        "It looks like a little misunderstanding. Lets move to the begining of conversation.", 
+                        optionsList,
+                        1);
+                    PromptDialog.Choice(context, this.OnOptionSelected, options);
                 }
             }
 
@@ -93,7 +98,8 @@ namespace CoinBot.Dialogs
             }
             catch (Exception ex) // .PostAsync instead of .Fail because we are in RootDialog - the bottom of the stack and nobody can handle this exception.
             {
-                await context.PostAsync(ex.Message);
+                if (ex.Message != null && !string.IsNullOrWhiteSpace(ex.Message))
+                    await context.PostAsync(ex.Message);
             }
         }
 
@@ -123,9 +129,9 @@ namespace CoinBot.Dialogs
                         break;
                 }
             }
-            catch (TooManyAttemptsException ex) // again .PostAsync instead of .Fail because we are in RootDialog - the bottom of the stack and nobody can handle this exception.
+            catch (TooManyAttemptsException) // such handling behavior because we are in RootDialog - the bottom of the stack and nobody can handle this exception.
             {
-                await context.PostAsync("It looks like a little misunderstanding. Lets move to the begining of conversation.");
+                // TooManyAttemptsException message still will be displayed
             }
         }
 

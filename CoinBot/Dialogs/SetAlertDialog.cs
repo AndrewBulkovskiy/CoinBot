@@ -13,8 +13,6 @@ namespace CoinBot.Dialogs
     {
         ICurrencyService _service;
         int attempts = 3;
-        private const string YesOption = "Yes";
-        private const string NoOption = "No";
 
         public SetAlertDialog(ICurrencyService service)
         {
@@ -59,10 +57,8 @@ namespace CoinBot.Dialogs
                     }
                     else
                     {
-                        attempts = 2;
-                        await context.PostAsync("There seems to be a misunderstanding between us.");
-                        var PromptOptions = new List<string>() { YesOption, NoOption };
-                        PromptDialog.Choice(context, this.OnOptionSelected, PromptOptions, "Let's return to the beginning of conversation?", "Let's return to the beginning of conversation?", 1);
+                        await context.PostAsync("There seems to be a misunderstanding between us. Let's go back.");
+                        context.Done(string.Empty);
                     }
                 }
             }
@@ -79,28 +75,6 @@ namespace CoinBot.Dialogs
                     context.Done("It still doesn't look like a number, let's return to the beginning of conversation.");
                 }
             }
-        }
-
-        private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
-        {
-            try
-            {
-                string optionSelected = await result;
-
-                switch (optionSelected)
-                {
-                    case YesOption:
-                        context.Done(string.Empty);
-                        break;
-                    case NoOption:
-                        break;
-                }
-            }
-            catch (TooManyAttemptsException)
-            {
-                context.Fail(new TooManyAttemptsException("It looks like a little misunderstanding. Let's start over."));
-            }
-
         }
 
     }
