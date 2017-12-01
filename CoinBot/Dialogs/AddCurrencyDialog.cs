@@ -103,7 +103,7 @@ namespace CoinBot.Dialogs
                             await context.PostAsync("Great! You added your first currency!");
                             var optionsList = new List<string>() { RemoveCurrencyOption, ShowPortfolioOption, SetAlertOption };
                             var options = new PromptOptions<string>("Ok, now you can: ",
-                                "Please select one of the options below:", 
+                                "Please select one of the options below:",
                                 "It looks like a little misunderstanding. Lets move to the begining of conversation.",
                                 optionsList,
                                 1);
@@ -142,18 +142,8 @@ namespace CoinBot.Dialogs
 
         private async Task ResumeArfetStringResultDialog(IDialogContext context, IAwaitable<string> result)
         {
-            try
-            {
                 var resultFromDialog = await result;
-                if (resultFromDialog != null && !string.IsNullOrWhiteSpace(resultFromDialog))
-                {
-                    context.Done(resultFromDialog);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unknown error occured. Please try again.");
-            }
+                context.Done(resultFromDialog);
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
