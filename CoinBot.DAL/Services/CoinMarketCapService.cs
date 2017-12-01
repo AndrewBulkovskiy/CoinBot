@@ -39,10 +39,7 @@ namespace CoinBot.DAL.Services
             if (currencyNameOrSymbol == null || string.IsNullOrWhiteSpace(currencyNameOrSymbol))
                 return null;
 
-            string filteredName = char.ToUpper(currencyNameOrSymbol[0]) + currencyNameOrSymbol.Substring(1);
-            string filteredSymbol = currencyNameOrSymbol.ToUpper();
-
-            var currency = _avaliableCurrencies.Where(c => c.Name == filteredName || c.Symbol == filteredSymbol)
+            var currency = _avaliableCurrencies.Where(c => c.Name.ToLower() == currencyNameOrSymbol.ToLower() || c.Symbol.ToLower() == currencyNameOrSymbol.ToLower())
                     .FirstOrDefault();
 
             if (currency != null)
@@ -95,10 +92,7 @@ namespace CoinBot.DAL.Services
             if (currencyNameOrSymbol == null || string.IsNullOrWhiteSpace(currencyNameOrSymbol))
                 return false;
 
-            string filteredName = char.ToUpper(currencyNameOrSymbol[0]) + currencyNameOrSymbol.Substring(1);
-            string filteredSymbol = currencyNameOrSymbol.ToUpper();
-
-            var currency = _avaliableCurrencies.Where(c => c.Name == filteredName || c.Symbol == filteredSymbol)
+            var currency = _avaliableCurrencies.Where(c => c.Name.ToLower() == currencyNameOrSymbol.ToLower() || c.Symbol.ToLower() == currencyNameOrSymbol.ToLower())
                     .FirstOrDefault();
 
             return (currency != null) ? true : false;
