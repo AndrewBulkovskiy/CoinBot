@@ -32,7 +32,7 @@ namespace CoinBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
             string currencyNameOrSymbol = string.Empty;
-            double currencyMultiplier = 1.0;
+            decimal currencyMultiplier = 1.0m;
 
             // Message forwarded from luis or not
             if (_luisResult == null)
@@ -47,7 +47,7 @@ namespace CoinBot.Dialogs
                 }
                 else
                 {
-                    double.TryParse(entities[0], out currencyMultiplier);
+                    decimal.TryParse(entities[0], out currencyMultiplier);
                     currencyNameOrSymbol = entities[1];
                 }
             }
@@ -56,7 +56,7 @@ namespace CoinBot.Dialogs
                 foreach (var entity in _luisResult.Entities)
                 {
                     if (entity.Type == "Currency.Multiplier" && entity.Entity != null)
-                        Double.TryParse(entity.Entity.Replace(" ", String.Empty), out currencyMultiplier);
+                        decimal.TryParse(entity.Entity.Replace(" ", String.Empty), out currencyMultiplier);
 
                     if (entity.Type == "Currency.Symbol" && entity.Entity != null)
                         currencyNameOrSymbol = entity.Entity;
@@ -67,7 +67,7 @@ namespace CoinBot.Dialogs
             }
 
             // Final input checking
-            if (currencyMultiplier > 0.0 && currencyNameOrSymbol != null && !string.IsNullOrWhiteSpace(currencyNameOrSymbol))
+            if (currencyMultiplier > 0.0m && currencyNameOrSymbol != null && !string.IsNullOrWhiteSpace(currencyNameOrSymbol))
             {
                 var currency = _service.GetCurrencyByNameOrSymbol(currencyNameOrSymbol);
 
@@ -79,7 +79,10 @@ namespace CoinBot.Dialogs
                     {
                         _service.RemoveCurrencyFromPortfolio(currency);
                         context.Done("Currency successfully deleted from your portfolio.");
-                        return;
+                    }
+                    else
+                    {
+                        context.Fail(new ArgumentException("Sorry i can't find that currency in your portfolio."));
                     }
                 }
             }
@@ -88,7 +91,6 @@ namespace CoinBot.Dialogs
                 context.Fail(new ArgumentException("Sorry i can't recognize value and currency (e.g. 1.0 BTC)."));
             }
 
-            context.Done("Sorry i can't find that currency in your portfolio.");
         }
 
     }

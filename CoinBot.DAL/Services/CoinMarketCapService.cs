@@ -26,7 +26,7 @@ namespace CoinBot.DAL.Services
         private List<CurrencyDTO> _avaliableCurrencies;
         private string _apiUrl = "https://api.coinmarketcap.com/v1/ticker/";
         private int _timerInterval = 60000;
-        private double _portfolioGrowthPercentage;
+        private decimal _portfolioGrowthPercentage;
 
         public CoinMarketCapService()
         {
@@ -101,7 +101,7 @@ namespace CoinBot.DAL.Services
             }
         }
 
-        public void StartTrackingPortfolio(double percentage)
+        public void StartTrackingPortfolio(decimal percentage)
         {
             this._portfolioGrowthPercentage = percentage;
             Ticker.Start(_timerInterval);
@@ -121,9 +121,8 @@ namespace CoinBot.DAL.Services
 
         private void CheckPortfolioGrowth()
         {
-            // add overflow logic
-            double oldTotalValue = 0.0;
-            double newTotalValue = 0.0;
+            decimal oldTotalValue = 0.0m;
+            decimal newTotalValue = 0.0m;
 
             for (int i = 0; i < Portfolio.Count; i++)
             {
@@ -135,7 +134,7 @@ namespace CoinBot.DAL.Services
                 }
             }
 
-            double percentageGrowth = ((newTotalValue - oldTotalValue) / Math.Truncate((newTotalValue + oldTotalValue) / 2.0)) * 100.0;
+            decimal percentageGrowth = ((newTotalValue - oldTotalValue) / Math.Truncate((newTotalValue + oldTotalValue) / 2.0m)) * 100.0m;
 
             if (percentageGrowth >= _portfolioGrowthPercentage) 
             {
@@ -170,7 +169,7 @@ namespace CoinBot.DAL.Services
                 }
             }
 
-            return CurrencyDTO.Convert(currency);
+            return CurrencyDTO.ConvertToCurrencyDTO(currency);
         }
 
 
@@ -198,7 +197,7 @@ namespace CoinBot.DAL.Services
                 }
             }
 
-            return CurrencyDTO.Convert(currency);
+            return CurrencyDTO.ConvertToCurrencyDTO(currency);
         }
 
         public List<CurrencyDTO> GetAllCurrencies()
@@ -228,7 +227,7 @@ namespace CoinBot.DAL.Services
             foreach (var currency in currencies)
             {
                 if (currency != null)
-                    result.Add(CurrencyDTO.Convert(currency));
+                    result.Add(CurrencyDTO.ConvertToCurrencyDTO(currency));
             }
 
             return result;
@@ -261,7 +260,7 @@ namespace CoinBot.DAL.Services
             foreach (var currency in currencies)
             {
                 if (currency != null)
-                    result.Add(CurrencyDTO.Convert(currency));
+                    result.Add(CurrencyDTO.ConvertToCurrencyDTO(currency));
             }
 
             return result;

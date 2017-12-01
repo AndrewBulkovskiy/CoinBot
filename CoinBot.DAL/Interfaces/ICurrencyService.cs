@@ -16,7 +16,7 @@ namespace CoinBot.DAL.Interfaces
         bool IsCurrencyAvaliable(string currencyNameOrSymbol);
         bool IsCurrencyInPortfolio(CurrencyDTO currency);
         void RefreshPortfolio();
-        void StartTrackingPortfolio(double percentageValue);
+        void StartTrackingPortfolio(decimal percentageValue);
         void StopTrackingPortfolio();
     }
 }

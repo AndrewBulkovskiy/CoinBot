@@ -40,12 +40,11 @@ namespace CoinBot.Dialogs
             PortfolioNotifier.channelId = message.ChannelId;
             PortfolioNotifier.conversationId = message.Conversation.Id;
 
-            double percentageValue = 0.0;
-            bool percentageRecognised = Double.TryParse(message.Text, out percentageValue);
+            bool percentageRecognised = Decimal.TryParse(message.Text, out decimal percentageValue);
 
             if (percentageRecognised)
             {
-                if (percentageValue > 0.0 && percentageValue <= 100.0)
+                if (percentageValue > 0.0m && percentageValue <= 100.0m)
                 {
                     _service.StartTrackingPortfolio(percentageValue);
                     context.Done($"Ok, i will send a notification as soon as your portfolio will grow on {percentageValue} percents.");
@@ -77,7 +76,7 @@ namespace CoinBot.Dialogs
                 }
                 else
                 {
-                    context.Done("Let's return to the beginning of conversation.");
+                    context.Done("It still doesn't look like a number, let's return to the beginning of conversation.");
                 }
             }
         }

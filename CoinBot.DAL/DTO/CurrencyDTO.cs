@@ -9,15 +9,15 @@ namespace CoinBot.DAL.DTO
         public string Id { get; set; }
         public string Name { get; set; }
         public string Symbol { get; set; }
-        public double Price { get; set; }
-        public double Multiplier { get; set; }
+        public decimal Price { get; set; }
+        public decimal Multiplier { get; set; }
 
         public CurrencyDTO()
         {
-            Multiplier = 1.0;
+            Multiplier = 1.0m;
         }
 
-        public static CurrencyDTO Convert(Currency cur)
+        public static CurrencyDTO ConvertToCurrencyDTO(Currency cur)
         {
             if (cur == null)
                 return null;
@@ -27,7 +27,7 @@ namespace CoinBot.DAL.DTO
                     Id = cur.Id,
                     Name = cur.Name,
                     Symbol = cur.Symbol,
-                    Price = cur.PriceUsd
+                    Price = Convert.ToDecimal(cur.PriceUsd)
                 };
         }
 

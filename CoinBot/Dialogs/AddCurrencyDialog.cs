@@ -42,7 +42,7 @@ namespace CoinBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
             string currencyNameOrSymbol = String.Empty;
-            double currencyMultiplier = 1.0;
+            decimal currencyMultiplier = 1.0m;
 
             // Message forwarded from luis or not
             if (_luisResult == null)
@@ -57,7 +57,7 @@ namespace CoinBot.Dialogs
                 }
                 else
                 {
-                    double.TryParse(entities[0], out currencyMultiplier);
+                    decimal.TryParse(entities[0], out currencyMultiplier);
                     currencyNameOrSymbol = entities[1];
                 }
             }
@@ -66,7 +66,7 @@ namespace CoinBot.Dialogs
                 foreach (var entity in _luisResult.Entities)
                 {
                     if (entity.Type == "Currency.Multiplier" && entity.Entity != null)
-                        double.TryParse(entity.Entity.Replace(" ", string.Empty), out currencyMultiplier);
+                        decimal.TryParse(entity.Entity.Replace(" ", string.Empty), out currencyMultiplier);
 
                     if (entity.Type == "Currency.Symbol" && entity.Entity != null)
                         currencyNameOrSymbol = entity.Entity;
@@ -77,7 +77,7 @@ namespace CoinBot.Dialogs
             }
 
             // Final input checking
-            if (currencyMultiplier > 0.0 && currencyNameOrSymbol != null && !string.IsNullOrWhiteSpace(currencyNameOrSymbol))
+            if (currencyMultiplier > 0.0m && currencyNameOrSymbol != null && !string.IsNullOrWhiteSpace(currencyNameOrSymbol))
             {
                 // Checking if user entered right curryncy name or symbol
                 bool isCurrencyAvaliable = _service.IsCurrencyAvaliable(currencyNameOrSymbol);
@@ -142,7 +142,7 @@ namespace CoinBot.Dialogs
                 var resultFromDialog = await result;
                 if (resultFromDialog != null && !string.IsNullOrWhiteSpace(resultFromDialog))
                 {
-                    await context.PostAsync(resultFromDialog);
+                    context.Done(resultFromDialog);
                 }
             }
             catch (Exception ex)
@@ -160,6 +160,7 @@ namespace CoinBot.Dialogs
                 switch (optionSelected)
                 {
                     case RemoveCurrencyOption:
+                        await context.PostAsync("Plesa type currency and value (e.g. *1.0 BTC*)");
                         context.Call(new RemoveCurrencyDialog(_service), this.ResumeArfetStringResultDialog);
                         break;
                     case ShowPortfolioOption:

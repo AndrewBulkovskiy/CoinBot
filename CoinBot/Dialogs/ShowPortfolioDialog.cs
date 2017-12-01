@@ -26,7 +26,7 @@ namespace CoinBot.Dialogs
             {
                 _service.RefreshPortfolio();
                 string portfolioString = "**Your Portfolio:** \n\n";
-                double portfolioTotalValue = 0.0;
+                decimal portfolioTotalValue = 0.0m;
                 foreach (var item in _service.Portfolio)
                 {
                     portfolioString += $"* {item} \n\n";
