@@ -13,7 +13,6 @@ namespace CoinBot.DAL.Interfaces
         CurrencyDTO GetCurrencyByNameOrSymbol(string currencyNameOrSymbol);
         void AddCurrencyToPortfolio(CurrencyDTO currency);
         void RemoveCurrencyFromPortfolio(CurrencyDTO currency);
-        void UpdateCurrency(CurrencyDTO currency);
         bool IsCurrencyAvaliable(string currencyNameOrSymbol);
         bool IsCurrencyInPortfolio(CurrencyDTO currency);
         void RefreshPortfolio();

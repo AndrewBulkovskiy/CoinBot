@@ -78,7 +78,7 @@ namespace CoinBot.Dialogs
                     if (portfolioContainsCurrency)
                     {
                         _service.RemoveCurrencyFromPortfolio(currency);
-                        context.Done("Currency successfully updated!.");
+                        context.Done("Portfolio updated!.");
                     }
                     else
                     {

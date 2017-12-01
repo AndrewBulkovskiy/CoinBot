@@ -81,11 +81,10 @@ namespace CoinBot.Dialogs
             {
                 // Checking if user entered right curryncy name or symbol
                 bool isCurrencyAvaliable = _service.IsCurrencyAvaliable(currencyNameOrSymbol);
+                var currency = _service.GetCurrencyByNameOrSymbol(currencyNameOrSymbol);
 
-                if (isCurrencyAvaliable)
+                if (isCurrencyAvaliable && currency != null)
                 {
-                    var currency = _service.GetCurrencyByNameOrSymbol(currencyNameOrSymbol);
-
                     // Setting custom multiplier
                     currency.Multiplier = currencyMultiplier;
 
@@ -93,11 +92,9 @@ namespace CoinBot.Dialogs
                     bool portfolioContainsCurrency = _service.IsCurrencyInPortfolio(currency);
                     if (!portfolioContainsCurrency)
                     {
-                        if (currency != null)
-                        {
-                            _service.AddCurrencyToPortfolio(currency);
-                            await context.PostAsync("Currency has been successfully added to your portfolio");
-                        }
+                        _service.AddCurrencyToPortfolio(currency);
+                        await context.PostAsync("Currency has been successfully added to your portfolio");
+
                         if (_service.Portfolio.Count == 1) // Seems like it is the first user currency added, Congratulations :)
                         {
                             await context.PostAsync("Great! You added your first currency!");
@@ -116,8 +113,8 @@ namespace CoinBot.Dialogs
                     }
                     else
                     {
-                        _service.UpdateCurrency(currency);
-                        context.Done("Currency successfully updated!");
+                        _service.AddCurrencyToPortfolio(currency);
+                        context.Done("Portfolio successfully updated!");
                     }
                 }
                 else
@@ -143,8 +140,8 @@ namespace CoinBot.Dialogs
 
         private async Task ResumeArfetStringResultDialog(IDialogContext context, IAwaitable<string> result)
         {
-                var resultFromDialog = await result;
-                context.Done(resultFromDialog);
+            var resultFromDialog = await result;
+            context.Done(resultFromDialog);
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)

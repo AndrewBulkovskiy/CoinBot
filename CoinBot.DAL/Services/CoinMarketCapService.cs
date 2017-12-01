@@ -34,7 +34,6 @@ namespace CoinBot.DAL.Services
             RefreshAvaliableCurrenciesData();
         }
 
-        // Returns fresh updated currency
         public CurrencyDTO GetCurrencyByNameOrSymbol(string currencyNameOrSymbol)
         {
             if (currencyNameOrSymbol == null || string.IsNullOrWhiteSpace(currencyNameOrSymbol))
@@ -55,16 +54,20 @@ namespace CoinBot.DAL.Services
         public void AddCurrencyToPortfolio(CurrencyDTO currency)
         {
             if (currency != null)
-                Portfolio.Add(currency);
-        }
-
-        public void UpdateCurrency(CurrencyDTO currency)
-        {
-            for (int i = 0; i < Portfolio.Count; i++)
             {
-                if (Portfolio[i].Equals(currency))
+                if(!IsCurrencyInPortfolio(currency))
                 {
-                    Portfolio[i].Multiplier += currency.Multiplier;
+                    Portfolio.Add(currency);
+                }
+                else
+                {
+                    for (int i = 0; i < Portfolio.Count; i++)
+                    {
+                        if (Portfolio[i].Equals(currency))
+                        {
+                            Portfolio[i].Multiplier += currency.Multiplier;
+                        }
+                    }
                 }
             }
         }
