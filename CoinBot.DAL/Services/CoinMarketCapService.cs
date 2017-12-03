@@ -48,6 +48,7 @@ namespace CoinBot.DAL.Services
                 return null;
         }
 
+        // Adding new currency to portfolio or updating existing currency (if portfolio already contains currency).
         public void AddCurrencyToPortfolio(CurrencyDTO currency)
         {
             if (currency != null)
@@ -69,6 +70,7 @@ namespace CoinBot.DAL.Services
             }
         }
 
+        // Removing currency from portfolio or updating existing currency (if portfolio already contains currency).
         public void RemoveCurrencyFromPortfolio(CurrencyDTO currency)
         {
             if (currency != null)
@@ -78,7 +80,7 @@ namespace CoinBot.DAL.Services
                     if (Portfolio[i].Equals(currency))
                     {
                         decimal difference = Portfolio[i].Multiplier - currency.Multiplier;
-                        if (difference >= 0)
+                        if (difference > 0)
                             Portfolio[i].Multiplier -= currency.Multiplier;
                         else
                             Portfolio.Remove(currency);
@@ -184,7 +186,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
-                        // Add handling
+                        // Add additional exception handling here if we do not wont to just return null object.
                     }
                 }
             }
@@ -212,7 +214,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
-                        // Add handling
+                        // Add additional exception handling here if we do not wont to just return null object.
                     }
                 }
             }
@@ -238,7 +240,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
-                        // Add handling
+                        // Add additional exception handling here if we do not wont to just return null object.
                     }
                 }
             }
@@ -271,7 +273,7 @@ namespace CoinBot.DAL.Services
                     }
                     catch (JsonSerializationException)
                     {
-                        // Add handling
+                        // Add additional exception handling here if we do not wont to just return null object.
                     }
                 }
             }

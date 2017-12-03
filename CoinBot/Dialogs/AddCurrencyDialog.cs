@@ -22,6 +22,7 @@ namespace CoinBot.Dialogs
         private const string RemoveCurrencyOption = "Remove currency";
         private const string ShowPortfolioOption = "See your portfolio";
         private const string SetAlertOption = "Set alert";
+        static bool isFirstCurrency = true;
 
         public AddCurrencyDialog(ICurrencyService service, LuisResult luisResult)
         {
@@ -88,33 +89,24 @@ namespace CoinBot.Dialogs
                     // Setting custom multiplier
                     currency.Multiplier = currencyMultiplier;
 
-                    // Checking if users portfolio already contains that currency
-                    bool portfolioContainsCurrency = _service.IsCurrencyInPortfolio(currency);
-                    if (!portfolioContainsCurrency)
-                    {
-                        _service.AddCurrencyToPortfolio(currency);
-                        await context.PostAsync("Currency has been successfully added to your portfolio");
+                    _service.AddCurrencyToPortfolio(currency);
+                    await context.PostAsync("Portfolio successfully updated!");
 
-                        if (_service.Portfolio.Count == 1) // Seems like it is the first user currency added, Congratulations :)
-                        {
-                            await context.PostAsync("Great! You added your first currency!");
-                            var optionsList = new List<string>() { RemoveCurrencyOption, ShowPortfolioOption, SetAlertOption };
-                            var options = new PromptOptions<string>("Ok, now you can: ",
-                                "Please select one of the options below:",
-                                "It looks like a little misunderstanding. Lets move to the begining of conversation.",
-                                optionsList,
-                                1);
-                            PromptDialog.Choice(context, this.OnOptionSelected, options);
-                        }
-                        else
-                        {
-                            context.Done(string.Empty);
-                        }
+                    if (isFirstCurrency) // Seems like it is the first user currency added, Congratulations :)
+                    {
+                        await context.PostAsync("Great! You added your first currency!");
+                        var optionsList = new List<string>() { RemoveCurrencyOption, ShowPortfolioOption, SetAlertOption };
+                        var options = new PromptOptions<string>("Ok, now you can: ",
+                            "Please select one of the options below:",
+                            "It looks like a little misunderstanding. Lets move to the begining of conversation.",
+                            optionsList,
+                            1);
+                        PromptDialog.Choice(context, this.OnOptionSelected, options);
+                        isFirstCurrency = false;
                     }
                     else
                     {
-                        _service.AddCurrencyToPortfolio(currency);
-                        context.Done("Portfolio successfully updated!");
+                        context.Done(string.Empty);
                     }
                 }
                 else
